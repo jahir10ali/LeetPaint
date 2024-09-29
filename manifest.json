@@ -3,7 +3,7 @@
   "name": "LeetPaint - Paint Tool for LeetCode",
   "version": "1.0",
   "description": "LeetPaint is a paint Tool for LeetCode that allows you to problem solve while never leaving the LeetCode workspace",
-  "permissions": ["tabs"],
+  "permissions": ["activeTab", "scripting", "tabs"],
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
@@ -15,7 +15,7 @@
   },
   "content_scripts": [
     {
-      "matches": ["*://leetcode.com/problems/*"],
+      "matches": ["https://leetcode.com/problems/*"],
       "js": ["js/content.js"]
     }
   ],
