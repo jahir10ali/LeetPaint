@@ -1,1 +1,1 @@
-# LeetPaint
+# LeetPaint - Paint Tool for LeetCode
