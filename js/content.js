@@ -84,7 +84,7 @@ function addPaintCanvas() {
     // Brush size selector
     controlsDiv.innerHTML += `
     <label for="brush-size">Brush Size:</label>
-    <input type="range" id="brush-size" min="1" max="20" value="5">
+    <input type="range" id="brush-size" min="1" max="20" value="8">
     `;
 
     // Undo and Redo buttons
@@ -129,9 +129,10 @@ function initializePaintCanvas(canvas) {
     let painting = false;
     let strokeHistory = [];  // To store all the strokes for undo/redo
     let undoneHistory = [];  // To store undone strokes for redo functionality
+    let images = [];         // Array to store images drawn on the canvas
 
     let currentColor = '#0BDA51';  // Default color
-    let currentBrushSize = 5;      // Default brush size
+    let currentBrushSize = 8;      // Default brush size
 
     // Get the color and brush size controls
     const colorPicker = document.getElementById('color-picker');
@@ -191,10 +192,16 @@ function initializePaintCanvas(canvas) {
         });
     }
 
-    // Redraw all strokes from history
+    // Redraw all strokes from history and images
     function redraw() {
         ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
 
+        // Draw images first
+        images.forEach(image => {
+            ctx.drawImage(image.img, image.x, image.y);
+        });
+
+        // Draw strokes
         strokeHistory.forEach(stroke => {
             if (stroke.length === 0) return;
             ctx.beginPath();
@@ -232,6 +239,7 @@ function initializePaintCanvas(canvas) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         strokeHistory = [];
         undoneHistory = [];
+        images = []; // Clear images as well
     }
 
     // Update color on color picker change
@@ -252,6 +260,31 @@ function initializePaintCanvas(canvas) {
 
     // Clear button listener
     clearBtn.addEventListener('click', clearCanvas);
+
+    // Handle image drop
+    canvas.addEventListener('dragover', (e) => {
+        e.preventDefault(); // Prevent default to allow drop
+    });
+
+    canvas.addEventListener('drop', (e) => {
+        e.preventDefault();
+        const files = e.dataTransfer.files;
+
+        if (files.length > 0) {
+            const file = files[0];
+            if (file.type.startsWith('image/')) {
+                const img = new Image();
+                img.onload = function() {
+                    // Store image with its original size and position
+                    const x = (canvas.width - img.width) / 2; // Center the image
+                    const y = (canvas.height - img.height) / 2; // Center the image
+                    images.push({ img, x, y });
+                    redraw(); // Redraw canvas with the new image
+                };
+                img.src = URL.createObjectURL(file); // Load the image
+            }
+        }
+    });
 
     // Attach mouse event listeners
     canvas.addEventListener('mousedown', startPosition);
