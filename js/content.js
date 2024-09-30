@@ -1,129 +1,37 @@
-// Function to inject CSS for the canvas and controls dynamically
-function injectCanvasCSS() {
-    const style = document.createElement('style');
-    style.textContent = `
-    /* Scoped styles for the paint tool */
-    #paint-controls {
-    margin-bottom: 20px;                     /* Increased spacing at the bottom */
-    display: flex;                           /* Flexbox for horizontal alignment */
-    align-items: center;                     /* Center items vertically */
-    background-color: #2c2c2c;               /* Darker background for controls */
-    padding: 15px;                           /* Padding for spacing */
-    border-radius: 8px;                      /* Rounded corners */
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5); /* Light shadow for depth */
-    z-index: 1000;                           /* Ensure controls are on top */
-    }
-
-    #paint-controls label {
-    margin-right: 15px;                      /* Increased spacing between label and input */
-    color: #ffffff;                          /* White labels for contrast */
-    font-size: 14px;                         /* Font size for better readability */
-    font-weight: bold;                       /* Bold labels for emphasis */
-    }
-
-    #color-picker, #brush-size {
-    border: 1px solid #555;                  /* Dark border around inputs */
-    border-radius: 4px;                      /* Rounded corners */
-    padding: 5px;                           /* Padding for better touch targets */
-    background-color: #444;                  /* Dark background for inputs */
-    color: #fff;                             /* White text color for inputs */
-    margin-left: 10px;                       /* Spacing on the left side */
-    }
-
-    #color-picker {
-    width: 60px;                             /* Fixed width for color picker */
-    }
-
-    #paint-controls button {
-    background-color: #5a5a5a;               /* Neutral gray for buttons */
-    color: white;                            /* White text color */
-    border: none;                            /* No border */
-    border-radius: 4px;                     /* Rounded corners */
-    padding: 10px 15px;                     /* Padding for buttons */
-    cursor: pointer;                         /* Pointer cursor for buttons */
-    margin-left: 10px;                      /* Spacing between buttons */
-    transition: background-color 0.3s, transform 0.2s; /* Smooth transitions */
-    font-size: 14px;                        /* Font size for buttons */
-    }
-
-    #paint-controls button:hover {
-    background-color: #777;                  /* Darker gray on hover */
-    transform: translateY(-2px);            /* Slight lift on hover */
-    }
-
-    #paint-controls button:active {
-    transform: translateY(0);                /* Reset position on active */
-    }
-
-    #leetpaint-canvas {
-    cursor: crosshair;                      /* Change cursor to crosshair for precision */
-    border: 2px solid #FFA116;              /* LeetCode's orange-yellow border */
-    background-color: #1e1e1e;               /* Dark background for the canvas */
-    margin-top: 20px;
-    border-radius: 8px;                     /* Rounded corners for a modern look */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); /* Enhanced shadow for depth */
-    }
-    `;
-    document.head.appendChild(style);
-}
-
 // Function to add the paint canvas and controls to the LeetCode page
 function addPaintCanvas() {
     console.log("Attempting to add paint canvas...");
 
-    // Create a div for controls
-    const controlsDiv = document.createElement('div');
-    controlsDiv.id = 'paint-controls';
+    // Fetch content.html and insert it into the page
+    fetch(chrome.runtime.getURL('content.html'))
+    .then(response => response.text())
+    .then(data => {
+        // Create a temporary container for the fetched HTML
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = data;
 
-    // Color picker
-    controlsDiv.innerHTML += `
-    <label for="color-picker">Color:</label>
-    <input type="color" id="color-picker" value="#0BDA51">
-    `;
+        // Append the controls and canvas to the page
+        const mainContent = document.querySelector('.description__24sA');
+        if (mainContent) {
+            mainContent.appendChild(tempDiv);
+            console.log("Canvas and controls added to main content");
+        } else {
+            document.body.appendChild(tempDiv);
+            console.log("Canvas and controls added to body as fallback");
+        }
 
-    // Brush size selector
-    controlsDiv.innerHTML += `
-    <label for="brush-size">Brush Size:</label>
-    <input type="range" id="brush-size" min="1" max="20" value="8">
-    `;
+        // Get the canvas element after appending it
+        const canvas = document.getElementById('leetpaint-canvas');
 
-    // Undo and Redo buttons
-    controlsDiv.innerHTML += `
-    <button id="undo-btn">Undo</button>
-    <button id="redo-btn">Redo</button>
-    `;
-
-    // Clear canvas button
-    controlsDiv.innerHTML += `
-    <button id="clear-btn">Clear</button>
-    `;
-
-    // Create the canvas
-    const canvas = document.createElement('canvas');
-    canvas.id = 'leetpaint-canvas';
-    canvas.width = window.innerWidth - 50; // Adjust canvas size
-    canvas.height = 800; // Canvas height
-
-    // Append the controls and canvas to the page
-    const mainContent = document.querySelector('.description__24sA');
-    if (mainContent) {
-        mainContent.appendChild(controlsDiv);
-        mainContent.appendChild(canvas);
-        console.log("Canvas and controls added to main content");
-    } else {
-        document.body.appendChild(controlsDiv);
-        document.body.appendChild(canvas);
-        console.log("Canvas and controls added to body as fallback");
-    }
-
-    // Inject the CSS for the canvas
-    injectCanvasCSS();
-
-    // Initialize the canvas for painting
-    initializePaintCanvas(canvas);
+        // Initialize the canvas for painting
+        initializePaintCanvas(canvas);
+    })
+    .catch(error => {
+        console.error("Error loading content.html:", error);
+    });
 }
 
-// Initialize the paint canvas with extended features
+// Initialize the paint canvas with extended features (same as before)
 function initializePaintCanvas(canvas) {
     const ctx = canvas.getContext('2d');
     let painting = false;
