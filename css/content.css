@@ -1,0 +1,60 @@
+#paint-controls {
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    background-color: #2c2c2c;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+#paint-controls label {
+    margin-right: 15px;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+#color-picker, #brush-size {
+    border: 1px solid #555;
+    border-radius: 4px;
+    padding: 5px;
+    background-color: #444;
+    color: #fff;
+    margin-left: 10px;
+}
+
+#color-picker {
+    width: 60px;
+}
+
+#paint-controls button {
+    background-color: #5a5a5a;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 15px;
+    cursor: pointer;
+    margin-left: 10px;
+    transition: background-color 0.3s, transform 0.2s;
+    font-size: 14px;
+}
+
+#paint-controls button:hover {
+    background-color: #777;
+    transform: translateY(-2px);
+}
+
+#paint-controls button:active {
+    transform: translateY(0);
+}
+
+#leetpaint-canvas {
+    cursor: crosshair;
+    border: 2px solid #FFA116;
+    background-color: #1e1e1e;
+    margin-top: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
