@@ -1,3 +1,24 @@
+/* Button styles */
+#toggle-leetpaint-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 10px 15px;
+    background-color: #3C3C3C;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    z-index: 1001; /* Ensure it's on top */
+    transition: background-color 0.3s;
+}
+
+/* Button hover effect */
+#toggle-leetpaint-btn:hover {
+    background-color: #FF8C00; /* Darker shade on hover */
+}
+
+
 #paint-controls {
     margin-bottom: 20px;
     display: flex;
