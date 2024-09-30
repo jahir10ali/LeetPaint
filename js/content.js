@@ -1,3 +1,41 @@
+// Function to create and add the "Use LeetPaint" button
+function createToggleButton() {
+    const button = document.createElement('button');
+    button.id = 'toggle-leetpaint-btn';
+    button.innerText = 'Open LeetPaint';
+    button.style.position = 'absolute'; // Change to absolute positioning
+
+    button.addEventListener('click', () => {
+        const canvasContainer = document.getElementById('leetpaint-canvas');
+        const controlsContainer = document.getElementById('paint-controls');
+
+        if (canvasContainer.style.display === 'none' || !canvasContainer.style.display) {
+            button.innerText = 'Close LeetPaint';
+            canvasContainer.style.display = 'block'; // Show the canvas
+            controlsContainer.style.display = 'flex'; // Show the controls
+            canvasContainer.scrollIntoView({ behavior: 'smooth' }); // Scroll to the canvas
+        } else {
+            button.innerText = 'Open LeetPaint';
+            canvasContainer.style.display = 'none'; // Hide the canvas
+            controlsContainer.style.display = 'none'; // Hide the controls
+        }
+    });
+
+    document.body.appendChild(button); // Append the button to the body
+
+    // Update button position based on scroll
+    const updateButtonPosition = () => {
+        const mainContent = document.querySelector('.description__24sA'); // Main content area
+        if (mainContent) {
+            const rect = mainContent.getBoundingClientRect();
+            button.style.top = `${window.scrollY + rect.bottom + 20}px`; // Position below the main content
+        }
+    };
+
+    // Update button position on scroll
+    window.addEventListener('scroll', updateButtonPosition);
+}
+
 // Function to add the paint canvas and controls to the LeetCode page
 function addPaintCanvas() {
     console.log("Attempting to add paint canvas...");
@@ -20,8 +58,14 @@ function addPaintCanvas() {
             console.log("Canvas and controls added to body as fallback");
         }
 
-        // Get the canvas element after appending it
+        // Hide the canvas and controls initially
         const canvas = document.getElementById('leetpaint-canvas');
+        const controls = document.getElementById('paint-controls');
+        canvas.style.display = 'none'; // Initially hidden
+        controls.style.display = 'none'; // Initially hidden
+
+        // Create the toggle button
+        createToggleButton();
 
         // Initialize the canvas for painting
         initializePaintCanvas(canvas);
