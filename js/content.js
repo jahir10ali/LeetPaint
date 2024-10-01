@@ -1,9 +1,8 @@
-// Function to create and add the "Use LeetPaint" button
 function createToggleButton() {
     const button = document.createElement('button');
     button.id = 'toggle-leetpaint-btn';
     button.innerText = 'Open LeetPaint';
-    button.style.position = 'absolute'; // Change to absolute positioning
+    button.style.position = 'absolute';
 
     button.addEventListener('click', () => {
         const canvasContainer = document.getElementById('leetpaint-canvas');
@@ -12,46 +11,41 @@ function createToggleButton() {
 
         if (scrollableContainer.style.display === 'none' || !scrollableContainer.style.display) {
             button.innerText = 'Close LeetPaint';
-            scrollableContainer.style.display = 'block'; // Show the entire container
-            canvasContainer.style.display = 'block'; // Show the canvas
-            controlsContainer.style.display = 'flex'; // Show the controls
-            canvasContainer.scrollIntoView({ behavior: 'smooth' }); // Scroll to the canvas
+            scrollableContainer.style.display = 'block';
+            canvasContainer.style.display = 'block';
+            controlsContainer.style.display = 'flex';
+            canvasContainer.scrollIntoView({ behavior: 'smooth' });
         } else {
             button.innerText = 'Open LeetPaint';
-            scrollableContainer.style.display = 'none'; // Hide the entire container
-            canvasContainer.style.display = 'none'; // Hide the canvas
-            controlsContainer.style.display = 'none'; // Hide the controls
+            scrollableContainer.style.display = 'none';
+            canvasContainer.style.display = 'none';
+            controlsContainer.style.display = 'none';
         }
     });
 
-    document.body.appendChild(button); // Append the button to the body
+    document.body.appendChild(button);
 
-    // Update button position based on scroll
+
     const updateButtonPosition = () => {
-        const mainContent = document.querySelector('.description__24sA'); // Main content area
+        const mainContent = document.querySelector('.description__24sA');
         if (mainContent) {
             const rect = mainContent.getBoundingClientRect();
-            button.style.top = `${window.scrollY + rect.bottom + 20}px`; // Position below the main content
+            button.style.top = `${window.scrollY + rect.bottom + 20}px`;
         }
     };
 
-    // Update button position on scroll
     window.addEventListener('scroll', updateButtonPosition);
 }
 
-// Function to add the paint canvas and controls to the LeetCode page
 function addPaintCanvas() {
     console.log("Attempting to add paint canvas...");
 
-    // Fetch content.html and insert it into the page
     fetch(chrome.runtime.getURL('content.html'))
     .then(response => response.text())
     .then(data => {
-        // Create a temporary container for the fetched HTML
         const tempDiv = document.createElement('div');
         tempDiv.innerHTML = data;
 
-        // Append the controls and canvas to the page
         const mainContent = document.querySelector('.description__24sA');
         if (mainContent) {
             mainContent.appendChild(tempDiv);
@@ -61,16 +55,13 @@ function addPaintCanvas() {
             console.log("Canvas and controls added to body as fallback");
         }
 
-        // Hide the canvas and controls initially
         const canvas = document.getElementById('leetpaint-canvas');
         const controls = document.getElementById('paint-controls');
-        canvas.style.display = 'none'; // Initially hidden
-        controls.style.display = 'none'; // Initially hidden
+        canvas.style.display = 'none';
+        controls.style.display = 'none';
 
-        // Create the toggle button
         createToggleButton();
 
-        // Initialize the canvas for painting
         initializePaintCanvas(canvas);
     })
     .catch(error => {
@@ -78,31 +69,26 @@ function addPaintCanvas() {
     });
 }
 
-// Initialize the paint canvas with extended features (same as before)
 function initializePaintCanvas(canvas) {
     const ctx = canvas.getContext('2d');
     let painting = false;
-    let strokeHistory = [];  // To store all the strokes for undo/redo
-    let undoneHistory = [];  // To store undone strokes for redo functionality
-    let images = [];         // Array to store images drawn on the canvas
+    let strokeHistory = [];
+    let undoneHistory = [];
+    let images = [];
 
-    let currentColor = '#0BDA51';  // Default color
-    let currentBrushSize = 6;      // Default brush size
+    let currentColor = '#0BDA51';
+    let currentBrushSize = 6;
 
-    // Get the color and brush size controls
     const colorPicker = document.getElementById('color-picker');
     const brushSizePicker = document.getElementById('brush-size');
 
-    // Undo/Redo buttons
     const undoBtn = document.getElementById('undo-btn');
     const redoBtn = document.getElementById('redo-btn');
 
-    // Clear button
     const clearBtn = document.getElementById('clear-btn');
 
     const removeImageBtn = document.getElementById('remove-image-btn');
 
-    // Adjust for canvas offset and scroll
     const getMousePos = (canvas, event) => {
         const rect = canvas.getBoundingClientRect();
         return {
@@ -111,19 +97,16 @@ function initializePaintCanvas(canvas) {
         };
     };
 
-    // Redraw all strokes from history and images
     function redraw() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // Draw images first
         images.forEach(image => {
             ctx.drawImage(image.img, image.x, image.y);
         });
 
-        // Draw strokes
         strokeHistory.forEach(stroke => {
             if (stroke.length === 0) return;
-            ctx.beginPath(); // Start a new path for each stroke
+            ctx.beginPath();
             ctx.strokeStyle = stroke[0].color;
             ctx.lineWidth = stroke[0].size;
             ctx.moveTo(stroke[0].x, stroke[0].y);
@@ -133,25 +116,22 @@ function initializePaintCanvas(canvas) {
                 ctx.stroke();
             });
         });
-        ctx.beginPath(); // Reset the path to avoid connecting the next drawing to the last stroke
+        ctx.beginPath();
     }
 
-    // Start drawing
     function startPosition(e) {
         painting = true;
-        undoneHistory = []; // Clear redo history when drawing a new stroke
-        strokeHistory.push([]); // Start a new stroke
-        ctx.beginPath(); // Reset the path when starting a new stroke to avoid drawing from the previous point
+        undoneHistory = [];
+        strokeHistory.push([]);
+        ctx.beginPath();
         draw(e);
     }
 
-    // Stop drawing
     function endPosition() {
         painting = false;
-        ctx.beginPath(); // Reset the path after completing a stroke to avoid connecting strokes
+        ctx.beginPath();
     }
 
-    // Draw on canvas
     function draw(e) {
         if (!painting) return;
 
@@ -163,10 +143,9 @@ function initializePaintCanvas(canvas) {
 
         ctx.lineTo(mousePos.x, mousePos.y);
         ctx.stroke();
-        ctx.beginPath(); // Start a new path so that the next `lineTo` doesn't connect from the previous point
+        ctx.beginPath();
         ctx.moveTo(mousePos.x, mousePos.y);
 
-        // Record the stroke
         strokeHistory[strokeHistory.length - 1].push({
             x: mousePos.x,
             y: mousePos.y,
@@ -175,72 +154,62 @@ function initializePaintCanvas(canvas) {
         });
     }
 
-    // Undo function
     function undo() {
         if (strokeHistory.length > 0) {
             undoneHistory.push(strokeHistory.pop());
-            redraw(); // Redraw the canvas after undoing a stroke
+            redraw();
         }
-        ctx.beginPath(); // Reset the path after undoing to avoid connecting new strokes to the previous ones
+        ctx.beginPath();
     }
 
-    // Redo function
     function redo() {
         if (undoneHistory.length > 0) {
             strokeHistory.push(undoneHistory.pop());
-            redraw(); // Redraw the canvas after redoing a stroke
+            redraw();
         }
-        ctx.beginPath(); // Reset the path after redoing to avoid connecting new strokes to the previous ones
+        ctx.beginPath();
     }
 
 
-    // Clear canvas
     function clearCanvas() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the entire canvas
-        strokeHistory = []; // Clear only the stroke history
-        // Do not clear the images; keep them intact
-        redraw(); // Redraw to show remaining images
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        strokeHistory = [];
+        redraw();
     }
 
     function removeImage() {
-        images = []; // Clear the images array
-        redraw(); // Redraw the canvas to reflect the removal
-        updateRemoveImageButtonVisibility(); // Update button visibility after removing the image
+        images = [];
+        redraw();
+        updateRemoveImageButtonVisibility();
     }
 
     function updateRemoveImageButtonVisibility() {
         const removeImageBtn = document.getElementById('remove-image-btn');
         if (images.length > 0) {
-            removeImageBtn.style.display = 'inline-block'; // Show the button
+            removeImageBtn.style.display = 'inline-block';
         } else {
-            removeImageBtn.style.display = 'none'; // Hide the button
+            removeImageBtn.style.display = 'none';
         }
     }
 
-    // Update color on color picker change
     colorPicker.addEventListener('change', (e) => {
         currentColor = e.target.value;
     });
 
-    // Update brush size on brush size picker change
     brushSizePicker.addEventListener('change', (e) => {
         currentBrushSize = e.target.value;
     });
 
-    // Undo button listener
     undoBtn.addEventListener('click', undo);
 
-    // Redo button listener
     redoBtn.addEventListener('click', redo);
 
-    // Clear button listener
     clearBtn.addEventListener('click', clearCanvas);
 
     removeImageBtn.addEventListener('click', removeImage)
 
-    // Handle image drop
     canvas.addEventListener('dragover', (e) => {
-        e.preventDefault(); // Prevent default to allow drop
+        e.preventDefault();
     });
 
     canvas.addEventListener('drop', (e) => {
@@ -252,63 +221,53 @@ function initializePaintCanvas(canvas) {
             if (file.type.startsWith('image/')) {
                 const img = new Image();
                 img.onload = function() {
-                    // Store image with its original size and position
-                    const x = (canvas.width - img.width) / 2; // Center the image
-                    const y = (canvas.height - img.height) / 2; // Center the image
+                    const x = (canvas.width - img.width) / 2;
+                    const y = (canvas.height - img.height) / 2;
                     images.push({ img, x, y });
-                    redraw(); // Redraw canvas with the new image
-                    updateRemoveImageButtonVisibility(); // Update button visibility after adding an image
+                    redraw();
+                    updateRemoveImageButtonVisibility();
 
                 };
-                img.src = URL.createObjectURL(file); // Load the image
+                img.src = URL.createObjectURL(file);
             }
         }
     });
 
     updateRemoveImageButtonVisibility();
 
-    // Attach mouse event listeners
     canvas.addEventListener('mousedown', startPosition);
     canvas.addEventListener('mouseup', endPosition);
     canvas.addEventListener('mousemove', draw);
     canvas.addEventListener('mouseout', endPosition);
 }
 
-// Function to force a full page reload and ensure correct URL
 function forcePageReload(targetUrl) {
     if (targetUrl) {
-        // Update the current URL before reloading
         window.history.replaceState(null, null, targetUrl);
     }
-    window.location.reload(); // Force full page reload
+    window.location.reload();
 }
 
-// Wait for the page to load before running the content script
 window.addEventListener('load', () => {
     console.log("Page loaded. Running content script...");
 
-    // Add LeetPaint canvas
     addPaintCanvas();
 
-    // Force page reload on link clicks
     document.addEventListener('click', (event) => {
-        const target = event.target.closest('a'); // Check if the clicked element is a link
+        const target = event.target.closest('a');
         if (target) {
-            event.preventDefault(); // Prevent default navigation behavior
-            forcePageReload(target.href); // Force reload to the clicked link's URL
+            event.preventDefault();
+            forcePageReload(target.href);
         }
     });
 
-    // Listen for browser back/forward navigation (popstate) and handle the reload
     window.addEventListener('popstate', () => {
         const isOnProblemPage = window.location.href.includes('/problems/');
 
         if (!isOnProblemPage) {
-            // If not on a problem page (likely on the problem list), reload the page
             forcePageReload(window.location.href);
         } else {
-            // If on a problem page, reload the problem list instead
-            const problemListUrl = '/list/problems'; // Replace with the actual problem list URL
+            const problemListUrl = '/list/problems';
             forcePageReload(problemListUrl);
         }
     });
