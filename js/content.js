@@ -97,6 +97,8 @@ function initializePaintCanvas(canvas) {
     // Clear button
     const clearBtn = document.getElementById('clear-btn');
 
+    const removeImageBtn = document.getElementById('remove-image-btn');
+
     // Adjust for canvas offset and scroll
     const getMousePos = (canvas, event) => {
         const rect = canvas.getBoundingClientRect();
@@ -191,10 +193,25 @@ function initializePaintCanvas(canvas) {
 
     // Clear canvas
     function clearCanvas() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        strokeHistory = [];
-        undoneHistory = [];
-        images = []; // Clear images as well
+        ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the entire canvas
+        strokeHistory = []; // Clear only the stroke history
+        // Do not clear the images; keep them intact
+        redraw(); // Redraw to show remaining images
+    }
+
+    function removeImage() {
+        images = []; // Clear the images array
+        redraw(); // Redraw the canvas to reflect the removal
+        updateRemoveImageButtonVisibility(); // Update button visibility after removing the image
+    }
+
+    function updateRemoveImageButtonVisibility() {
+        const removeImageBtn = document.getElementById('remove-image-btn');
+        if (images.length > 0) {
+            removeImageBtn.style.display = 'inline-block'; // Show the button
+        } else {
+            removeImageBtn.style.display = 'none'; // Hide the button
+        }
     }
 
     // Update color on color picker change
@@ -216,6 +233,8 @@ function initializePaintCanvas(canvas) {
     // Clear button listener
     clearBtn.addEventListener('click', clearCanvas);
 
+    removeImageBtn.addEventListener('click', removeImage)
+
     // Handle image drop
     canvas.addEventListener('dragover', (e) => {
         e.preventDefault(); // Prevent default to allow drop
@@ -235,11 +254,15 @@ function initializePaintCanvas(canvas) {
                     const y = (canvas.height - img.height) / 2; // Center the image
                     images.push({ img, x, y });
                     redraw(); // Redraw canvas with the new image
+                    updateRemoveImageButtonVisibility(); // Update button visibility after adding an image
+
                 };
                 img.src = URL.createObjectURL(file); // Load the image
             }
         }
     });
+
+    updateRemoveImageButtonVisibility();
 
     // Attach mouse event listeners
     canvas.addEventListener('mousedown', startPosition);
