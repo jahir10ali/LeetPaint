@@ -8,14 +8,17 @@ function createToggleButton() {
     button.addEventListener('click', () => {
         const canvasContainer = document.getElementById('leetpaint-canvas');
         const controlsContainer = document.getElementById('paint-controls');
+        const scrollableContainer = document.getElementById('scrollable-canvas-container');
 
-        if (canvasContainer.style.display === 'none' || !canvasContainer.style.display) {
+        if (scrollableContainer.style.display === 'none' || !scrollableContainer.style.display) {
             button.innerText = 'Close LeetPaint';
+            scrollableContainer.style.display = 'block'; // Show the entire container
             canvasContainer.style.display = 'block'; // Show the canvas
             controlsContainer.style.display = 'flex'; // Show the controls
             canvasContainer.scrollIntoView({ behavior: 'smooth' }); // Scroll to the canvas
         } else {
             button.innerText = 'Open LeetPaint';
+            scrollableContainer.style.display = 'none'; // Hide the entire container
             canvasContainer.style.display = 'none'; // Hide the canvas
             controlsContainer.style.display = 'none'; // Hide the controls
         }

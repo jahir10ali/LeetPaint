@@ -90,6 +90,7 @@
     display: flex; /* Make it a flex container to center the canvas */
     justify-content: center; /* Center the canvas horizontally */
     align-items: center; /* Center the canvas vertically if needed */
+    display: none;
 }
 
 /* Canvas styles */
