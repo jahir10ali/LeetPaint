@@ -84,7 +84,7 @@ function initializePaintCanvas(canvas) {
     let images = [];         // Array to store images drawn on the canvas
 
     let currentColor = '#0BDA51';  // Default color
-    let currentBrushSize = 8;      // Default brush size
+    let currentBrushSize = 6;      // Default brush size
 
     // Get the color and brush size controls
     const colorPicker = document.getElementById('color-picker');
@@ -97,27 +97,53 @@ function initializePaintCanvas(canvas) {
     // Clear button
     const clearBtn = document.getElementById('clear-btn');
 
-    // Adjust for canvas offset
+    // Adjust for canvas offset and scroll
     const getMousePos = (canvas, event) => {
         const rect = canvas.getBoundingClientRect();
         return {
             x: event.clientX - rect.left,
-            y: event.clientY - rect.top
+            y: event.clientY - rect.top + document.getElementById('scrollable-canvas-container').scrollTop
         };
     };
+
+    // Redraw all strokes from history and images
+    function redraw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
+
+        // Draw images first
+        images.forEach(image => {
+            ctx.drawImage(image.img, image.x, image.y);
+        });
+
+        // Draw strokes
+        strokeHistory.forEach(stroke => {
+            if (stroke.length === 0) return;
+            ctx.beginPath(); // Start a new path for each stroke
+            ctx.strokeStyle = stroke[0].color;
+            ctx.lineWidth = stroke[0].size;
+            ctx.moveTo(stroke[0].x, stroke[0].y);
+
+            stroke.forEach(point => {
+                ctx.lineTo(point.x, point.y);
+                ctx.stroke();
+            });
+        });
+        ctx.beginPath(); // Reset the path to avoid connecting the next drawing to the last stroke
+    }
 
     // Start drawing
     function startPosition(e) {
         painting = true;
         undoneHistory = []; // Clear redo history when drawing a new stroke
         strokeHistory.push([]); // Start a new stroke
+        ctx.beginPath(); // Reset the path when starting a new stroke to avoid drawing from the previous point
         draw(e);
     }
 
     // Stop drawing
     function endPosition() {
         painting = false;
-        ctx.beginPath();
+        ctx.beginPath(); // Reset the path after completing a stroke to avoid connecting strokes
     }
 
     // Draw on canvas
@@ -132,7 +158,7 @@ function initializePaintCanvas(canvas) {
 
         ctx.lineTo(mousePos.x, mousePos.y);
         ctx.stroke();
-        ctx.beginPath();
+        ctx.beginPath(); // Start a new path so that the next `lineTo` doesn't connect from the previous point
         ctx.moveTo(mousePos.x, mousePos.y);
 
         // Record the stroke
@@ -144,47 +170,24 @@ function initializePaintCanvas(canvas) {
         });
     }
 
-    // Redraw all strokes from history and images
-    function redraw() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
-
-        // Draw images first
-        images.forEach(image => {
-            ctx.drawImage(image.img, image.x, image.y);
-        });
-
-        // Draw strokes
-        strokeHistory.forEach(stroke => {
-            if (stroke.length === 0) return;
-            ctx.beginPath();
-            ctx.strokeStyle = stroke[0].color;
-            ctx.lineWidth = stroke[0].size;
-            ctx.moveTo(stroke[0].x, stroke[0].y);
-
-            stroke.forEach(point => {
-                ctx.lineTo(point.x, point.y);
-                ctx.stroke();
-                ctx.beginPath();
-                ctx.moveTo(point.x, point.y);
-            });
-        });
-    }
-
     // Undo function
     function undo() {
         if (strokeHistory.length > 0) {
             undoneHistory.push(strokeHistory.pop());
-            redraw();
+            redraw(); // Redraw the canvas after undoing a stroke
         }
+        ctx.beginPath(); // Reset the path after undoing to avoid connecting new strokes to the previous ones
     }
 
     // Redo function
     function redo() {
         if (undoneHistory.length > 0) {
             strokeHistory.push(undoneHistory.pop());
-            redraw();
+            redraw(); // Redraw the canvas after redoing a stroke
         }
+        ctx.beginPath(); // Reset the path after redoing to avoid connecting new strokes to the previous ones
     }
+
 
     // Clear canvas
     function clearCanvas() {
@@ -245,8 +248,42 @@ function initializePaintCanvas(canvas) {
     canvas.addEventListener('mouseout', endPosition);
 }
 
+// Function to force a full page reload and ensure correct URL
+function forcePageReload(targetUrl) {
+    if (targetUrl) {
+        // Update the current URL before reloading
+        window.history.replaceState(null, null, targetUrl);
+    }
+    window.location.reload(); // Force full page reload
+}
+
 // Wait for the page to load before running the content script
 window.addEventListener('load', () => {
     console.log("Page loaded. Running content script...");
+
+    // Add LeetPaint canvas
     addPaintCanvas();
+
+    // Force page reload on link clicks
+    document.addEventListener('click', (event) => {
+        const target = event.target.closest('a'); // Check if the clicked element is a link
+        if (target) {
+            event.preventDefault(); // Prevent default navigation behavior
+            forcePageReload(target.href); // Force reload to the clicked link's URL
+        }
+    });
+
+    // Listen for browser back/forward navigation (popstate) and handle the reload
+    window.addEventListener('popstate', () => {
+        const isOnProblemPage = window.location.href.includes('/problems/');
+
+        if (!isOnProblemPage) {
+            // If not on a problem page (likely on the problem list), reload the page
+            forcePageReload(window.location.href);
+        } else {
+            // If on a problem page, reload the problem list instead
+            const problemListUrl = '/list/problems'; // Replace with the actual problem list URL
+            forcePageReload(problemListUrl);
+        }
+    });
 });

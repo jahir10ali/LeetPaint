@@ -21,14 +21,17 @@
 
 
 #paint-controls {
-    margin-bottom: 20px;
+    margin-bottom: -25px;
     display: flex;
     align-items: center;
+    justify-content: center;  /* Center items horizontally */
     background-color: #2c2c2c;
-    padding: 15px;
+    padding: 5px;
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
     z-index: 1000;
+    width: 60%;                /* Set width */
+    margin: 0 auto;           /* Center the controls */
 }
 
 #paint-controls label {
@@ -45,10 +48,11 @@
     background-color: #444;
     color: #fff;
     margin-left: 10px;
+    margin-right: 30px; /* Add margin to the right */
 }
 
 #color-picker {
-    width: 60px;
+    width: 40px;
 }
 
 #paint-controls button {
@@ -56,9 +60,10 @@
     color: white;
     border: none;
     border-radius: 4px;
-    padding: 10px 15px;
+    padding: 5px 10px;
     cursor: pointer;
     margin-left: 10px;
+    margin-right: 10px; /* Add margin to the right */
     transition: background-color 0.3s, transform 0.2s;
     font-size: 14px;
 }
@@ -72,11 +77,25 @@
     transform: translateY(0);
 }
 
+/* Scrollable canvas container */
+#scrollable-canvas-container {
+    width: 1810px; /* Set a width (e.g., 80% of its parent) */
+    max-width: 2000px; /* Optional: Limit maximum width */
+    max-height: 820px; /* Limit visible height */
+    overflow-y: auto; /* Enable vertical scrolling */
+    border: 2px solid #FFA116;
+    margin: 5px auto; /* Center the container */
+    background-color: #1e1e1e;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    display: flex; /* Make it a flex container to center the canvas */
+    justify-content: center; /* Center the canvas horizontally */
+    align-items: center; /* Center the canvas vertically if needed */
+}
+
+/* Canvas styles */
 #leetpaint-canvas {
     cursor: crosshair;
-    border: 2px solid #FFA116;
-    background-color: #1e1e1e;
-    margin-top: 20px;
     border-radius: 8px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
 }
+
