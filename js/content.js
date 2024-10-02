@@ -221,12 +221,19 @@ function initializePaintCanvas(canvas) {
             if (file.type.startsWith('image/')) {
                 const img = new Image();
                 img.onload = function() {
-                    const x = (canvas.width - img.width) / 2;
-                    const y = (canvas.height - img.height) / 2;
+                    const scrollableContainer = document.getElementById('scrollable-canvas-container');
+                    const scrollLeft = scrollableContainer.scrollLeft;
+                    const scrollTop = scrollableContainer.scrollTop;
+
+                    const visibleWidth = scrollableContainer.clientWidth;
+                    const visibleHeight = scrollableContainer.clientHeight;
+
+                    const x = scrollLeft + (visibleWidth - img.width) / 2;
+                    const y = scrollTop + (visibleHeight - img.height) / 2;
+
                     images.push({ img, x, y });
                     redraw();
                     updateRemoveImageButtonVisibility();
-
                 };
                 img.src = URL.createObjectURL(file);
             }
