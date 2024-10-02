@@ -28,8 +28,5 @@
   ],
   "host_permissions": [
         "*://leetcode.com/*"
-  ],
-  "background": {
-    "service_worker": "js/background.js"
-  }
+  ]
 }
