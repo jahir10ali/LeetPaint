@@ -26,7 +26,7 @@ Drawing and visualising problems is a highly recommended strategy within the cod
 
 ## Screenshots
 ![Screenshot 1](https://github.com/jahir10ali/LeetPaint/blob/main/screenshots/Screenshot1.png?raw=True)
-![Screenshot 3](https://github.com/jahir10ali/LeetPaint/blob/main/screenshots/Screenshot3.png?raw=True)
+![Screenshot 3](https://github.com/jahir10ali/LeetPaint/blob/main/screenshots/Screenshot2.png?raw=True)
 
 ## Contributing
 
