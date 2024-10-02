@@ -24,6 +24,10 @@ Drawing and visualising problems is a highly recommended strategy within the cod
 
 - **Cross-Platform Compatibility**: Built as a browser extension, LeetPaint can be accessed from any computer by installing this extension with a web browser.
 
+## Screenshots
+![Screenshot 1](https://github.com/jahir10ali/LeetPaint/blob/main/screenshots/Screenshot1.png?raw=True)
+![Screenshot 3](https://github.com/jahir10ali/LeetPaint/blob/main/screenshots/Screenshot3.png?raw=True)
+
 ## Contributing
 
 LeetPaint is an open-source project, and contributions are highly encouraged! If you want to help improve LeetPaint, follow these steps:
