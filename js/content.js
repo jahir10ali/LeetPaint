@@ -92,8 +92,8 @@ function initializePaintCanvas(canvas) {
     const getMousePos = (canvas, event) => {
         const rect = canvas.getBoundingClientRect();
         return {
-            x: event.clientX - rect.left,
-            y: event.clientY - rect.top + document.getElementById('scrollable-canvas-container').scrollTop
+            x: (event.clientX - rect.left) * (canvas.width / rect.width),
+            y: (event.clientY - rect.top) * (canvas.height / rect.height)
         };
     };
 
