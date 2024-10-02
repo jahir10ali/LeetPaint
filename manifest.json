@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "LeetPaint - Paint Tool for LeetCode",
   "version": "1.0",
-  "description": "LeetPaint is paint tool for LeetCode that can be used to visually represent coding problems through drawings, empowering problem solving.",
+  "description": "LeetPaint is paint tool for LeetCode where users can draw and annotate problem diagrams, empowering problem solving.",
   "permissions": ["activeTab", "scripting", "tabs"],
   "action": {
     "default_popup": "popup.html",
