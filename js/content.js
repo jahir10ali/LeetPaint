@@ -78,9 +78,13 @@ function initializePaintCanvas(canvas) {
 
     let currentColor = '#0BDA51';
     let currentBrushSize = 6;
+    let toolType = 'paintbrush';
+
+    const canvasBackgroundColor = '#1e1e1e';
 
     const colorPicker = document.getElementById('color-picker');
     const brushSizePicker = document.getElementById('brush-size');
+    const typeSelect = document.getElementById('type-select');
 
     const undoBtn = document.getElementById('undo-btn');
     const redoBtn = document.getElementById('redo-btn');
@@ -137,9 +141,15 @@ function initializePaintCanvas(canvas) {
 
         const mousePos = getMousePos(canvas, e);
 
-        ctx.lineWidth = currentBrushSize;
         ctx.lineCap = 'round';
-        ctx.strokeStyle = currentColor;
+
+        if (toolType === 'eraser') {
+            ctx.strokeStyle = canvasBackgroundColor;
+            ctx.lineWidth = parseInt(currentBrushSize) + 15;
+        } else {
+            ctx.strokeStyle = currentColor;
+            ctx.lineWidth = currentBrushSize;
+        }
 
         ctx.lineTo(mousePos.x, mousePos.y);
         ctx.stroke();
@@ -198,6 +208,10 @@ function initializePaintCanvas(canvas) {
 
     brushSizePicker.addEventListener('change', (e) => {
         currentBrushSize = e.target.value;
+    });
+
+    typeSelect.addEventListener('change', (e) => {
+        toolType = e.target.value;
     });
 
     undoBtn.addEventListener('click', undo);
