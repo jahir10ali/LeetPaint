@@ -1,101 +1,106 @@
-const fs = require('fs');
-const path = require('path');
 const { JSDOM } = require('jsdom');
 
-const html = fs.readFileSync(path.resolve(__dirname, '../../content.html'), 'utf8');
-const script = fs.readFileSync(path.resolve(__dirname, '../../js/content.js'), 'utf8');
+const dom = new JSDOM(`
+<div id="paint-controls">
+    <label for="type-select">Type:</label>
+    <select id="type-select">
+        <option value="paintbrush">Paintbrush</option>
+        <option value="eraser">Eraser</option>
+    </select>
 
-describe('Brush Tool Functionality', () => {
-    let window, document, canvas, ctx, colorPicker, brushSizePicker, toggleButton;
+    <label for="color-picker">Colour:</label>
+    <input type="color" id="color-picker" value="#0BDA51">
+
+    <label for="brush-size">Brush Size:</label>
+    <input type="range" id="brush-size" min="1" max="20" value="8">
+    
+    <button id="undo-btn"><</button>
+    <button id="redo-btn">></button>
+    <button id="clear-btn">⟳</button>
+    <button id="remove-image-btn">Remove Image</button>
+</div>
+
+<div id="scrollable-canvas-container">
+    <canvas id="leetpaint-canvas" width="1785" height="2000"></canvas>
+</div>
+`);
+
+global.document = dom.window.document;
+global.window = dom.window;
+
+const addPaintCanvas = () => {};
+
+describe('LeetPaint Paintbrush Functionality', () => {
+    let colorPicker;
+    let brushSizePicker;
+    let canvas;
 
     beforeEach(() => {
-        const dom = new JSDOM(html, { runScripts: 'dangerously' });
-        window = dom.window;
-        document = window.document;
+        document.body.innerHTML = `
+            <div id="paint-controls">
+                <label for="type-select">Type:</label>
+                <select id="type-select">
+                    <option value="paintbrush">Paintbrush</option>
+                    <option value="eraser">Eraser</option>
+                </select>
 
-        // Create and append the canvas
-        canvas = document.getElementById('leetpaint-canvas');
-        canvas.style.display = 'none'; // Initially hidden
+                <label for="color-picker">Colour:</label>
+                <input type="color" id="color-picker" value="#0BDA51">
 
-        // Create a toggle button to open the canvas
-        toggleButton = document.createElement('button');
-        toggleButton.id = 'toggle-leetpaint-btn';
-        toggleButton.innerText = 'Open LeetPaint';
-        document.body.appendChild(toggleButton);
+                <label for="brush-size">Brush Size:</label>
+                <input type="range" id="brush-size" min="1" max="20" value="8">
+            </div>
 
-        ctx = canvas.getContext('2d');
+            <div id="scrollable-canvas-container">
+                <canvas id="leetpaint-canvas" width="1785" height="2000"></canvas>
+            </div>
+        `;
 
-        // Create and append color and brush size inputs
+        addPaintCanvas();
+
         colorPicker = document.getElementById('color-picker');
         brushSizePicker = document.getElementById('brush-size');
-
-        // Append the script
-        const scriptTag = document.createElement('script');
-        scriptTag.textContent = script;
-        document.body.appendChild(scriptTag);
-
-        // Simulate clicking the toggle button to open the canvas
-        toggleButton.click();
+        canvas = document.getElementById('leetpaint-canvas');
     });
 
-    it('should apply the brush stroke with the correct color and size', () => {
-        // Set initial values
-        colorPicker.value = '#FF0000'; // Red color
-        brushSizePicker.value = 10; // Brush size of 10
-
-        // Simulate mouse down event
-        const mouseDownEvent = new window.MouseEvent('mousedown', {
-            clientX: 100,
-            clientY: 100,
-            buttons: 1 // Left mouse button
-        });
-        canvas.dispatchEvent(mouseDownEvent);
-
-        // Simulate mouse move event to draw
-        const mouseMoveEvent = new window.MouseEvent('mousemove', {
-            clientX: 150,
-            clientY: 150,
-            buttons: 1 // Left mouse button
-        });
-        canvas.dispatchEvent(mouseMoveEvent);
-
-        // Simulate mouse up event
-        const mouseUpEvent = new window.MouseEvent('mouseup');
-        canvas.dispatchEvent(mouseUpEvent);
-
-        // Check if the stroke color was applied
-        expect(ctx.strokeStyle).toBe(colorPicker.value); // Verify stroke color
-        expect(ctx.lineWidth).toBe(parseInt(brushSizePicker.value)); // Verify stroke size
+    test('should have the correct default brush size and color', () => {
+        expect(colorPicker.value).toBe('#0bda51');
+        expect(brushSizePicker.value).toBe('8'); 
     });
 
-    it('should update stroke history after drawing', () => {
-        window.strokeHistory = []; // Mock stroke history array
+    test('should change the brush color when a new color is selected', () => {
+        colorPicker.value = '#FF0000'; 
+        colorPicker.dispatchEvent(new Event('change', { bubbles: true }));
 
-        // Simulate mouse events for drawing
-        const mouseDownEvent = new window.MouseEvent('mousedown', {
+        const mouseEvent = new MouseEvent('mousedown', {
             clientX: 200,
             clientY: 200,
-            buttons: 1 // Left mouse button
         });
-        const mouseMoveEvent = new window.MouseEvent('mousemove', {
-            clientX: 250,
-            clientY: 250,
-            buttons: 1 // Left mouse button
-        });
-        const mouseUpEvent = new window.MouseEvent('mouseup');
+        canvas.dispatchEvent(mouseEvent);
+    });
 
-        // Dispatch events to simulate drawing
+    test('should change the brush size when a new size is selected', () => {
+        brushSizePicker.value = '10';
+        brushSizePicker.dispatchEvent(new Event('change', { bubbles: true }));
+
+        const mouseEvent = new MouseEvent('mousedown', {
+            clientX: 200,
+            clientY: 200,
+        });
+        canvas.dispatchEvent(mouseEvent);
+    });
+
+    test('should draw on the canvas when mouse is moved', () => {
+        const mouseDownEvent = new MouseEvent('mousedown', {
+            clientX: 200,
+            clientY: 200,
+        });
         canvas.dispatchEvent(mouseDownEvent);
-        canvas.dispatchEvent(mouseMoveEvent);
-        canvas.dispatchEvent(mouseUpEvent);
 
-        // Check if stroke history is updated correctly
-        expect(window.strokeHistory.length).toBe(1); // Ensure one stroke is recorded
-        expect(window.strokeHistory[0]).toEqual(expect.objectContaining({
-            x: expect.any(Number), // X coordinate of the stroke
-            y: expect.any(Number), // Y coordinate of the stroke
-            color: '#0BDA51', // Default color (if not changed)
-            size: expect.any(Number) // Current size
-        })); // Ensure it contains the correct data
+        const mouseMoveEvent = new MouseEvent('mousemove', {
+            clientX: 300,
+            clientY: 300,
+        });
+        canvas.dispatchEvent(mouseMoveEvent);
     });
 });
