@@ -7,6 +7,7 @@
     "test": "jest --silent"
   },
   "dependencies": {
+    "jest-puppeteer": "^10.1.1",
     "puppeteer": "^23.5.0"
   }
 }
