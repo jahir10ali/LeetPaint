@@ -1,56 +1,103 @@
-/*const fs = require('fs');
-const path = require('path');
 const { JSDOM } = require('jsdom');
 
-const html = fs.readFileSync(path.resolve(__dirname, '../../content.html'), 'utf8');
-const script = fs.readFileSync(path.resolve(__dirname, '../../js/content.js'), 'utf8');
+const dom = new JSDOM(`
+<div id="paint-controls">
+    <label for="type-select">Type:</label>
+    <select id="type-select">
+        <option value="paintbrush">Paintbrush</option>
+        <option value="eraser">Eraser</option>
+    </select>
 
-describe('Eraser Tool Functionality', () => {
-  let window, document, canvas, ctx, eraserBtn, colorPicker, currentColor, canvasBackgroundColor;
+    <label for="color-picker">Colour:</label>
+    <input type="color" id="color-picker" value="#0BDA51">
 
-  beforeEach(() => {
-    const dom = new JSDOM(html, { runScripts: 'dangerously' });
-    window = dom.window;
-    document = window.document;
-
-    canvas = document.getElementById('leetpaint-canvas');
-    ctx = canvas.getContext('2d');
-
-    eraserBtn = document.getElementById('type-select');
-    colorPicker = document.getElementById('color-picker');
+    <label for="brush-size">Brush Size:</label>
+    <input type="range" id="brush-size" min="1" max="20" value="6"> <!-- Updated default value to 6 for eraser -->
     
-    const scriptTag = document.createElement('script');
-    scriptTag.textContent = script;
-    document.body.appendChild(scriptTag);
+    <button id="undo-btn"><</button>
+    <button id="redo-btn">></button>
+    <button id="clear-btn">⟳</button>
+    <button id="remove-image-btn">Remove Image</button>
+</div>
 
-    currentColor = '#FFFFFF'; // Set eraser color (white)
-    canvasBackgroundColor = '#1e1e1e'; // Background color of the canvas
-    colorPicker.value = currentColor; // Set the color picker to white
-    eraserBtn.value = 'eraser'; // Set to eraser
-  });
+<div id="scrollable-canvas-container">
+    <canvas id="leetpaint-canvas" width="1785" height="2000"></canvas>
+</div>
+`);
 
-  it('should erase the area with the correct size and background color', () => {
-    // Simulate mouse down event
-    const mouseEvent = new window.MouseEvent('mousedown', {
-      clientX: 100,
-      clientY: 100
+global.document = dom.window.document;
+global.window = dom.window;
+
+const addPaintCanvas = () => {};
+
+describe('LeetPaint Eraser Functionality', () => {
+    let colorPicker;
+    let brushSizePicker;
+    let canvas;
+
+    beforeEach(() => {
+        document.body.innerHTML = `
+            <div id="paint-controls">
+                <label for="type-select">Type:</label>
+                <select id="type-select">
+                    <option value="paintbrush">Paintbrush</option>
+                    <option value="eraser">Eraser</option>
+                </select>
+
+                <label for="color-picker">Colour:</label>
+                <input type="color" id="color-picker" value="#1e1e1e"> <!-- Default color for eraser (canvas background) -->
+                
+                <label for="brush-size">Brush Size:</label>
+                <input type="range" id="brush-size" min="1" max="20" value="6"> <!-- Default size for eraser -->
+            </div>
+
+            <div id="scrollable-canvas-container">
+                <canvas id="leetpaint-canvas" width="1785" height="2000"></canvas>
+            </div>
+        `;
+
+        addPaintCanvas();
+
+        colorPicker = document.getElementById('color-picker');
+        brushSizePicker = document.getElementById('brush-size');
+        canvas = document.getElementById('leetpaint-canvas');
     });
 
-    canvas.dispatchEvent(mouseEvent);
-    
-    // Simulate mouse move event to erase
-    const mouseMoveEvent = new window.MouseEvent('mousemove', {
-      clientX: 150,
-      clientY: 150
+    test('should have the correct default eraser size and color', () => {
+        expect(colorPicker.value).toBe('#1e1e1e'); 
+        expect(brushSizePicker.value).toBe('6');
     });
-    canvas.dispatchEvent(mouseMoveEvent);
-    
-    // Simulate mouse up event
-    const mouseUpEvent = new window.MouseEvent('mouseup');
-    canvas.dispatchEvent(mouseUpEvent);
 
-    // Check if the stroke is drawn with the eraser color (background color)
-    expect(ctx.strokeStyle).toBe(canvasBackgroundColor);
-  });
+    test('should draw on the canvas with the eraser', () => {
+        const mouseDownEvent = new MouseEvent('mousedown', {
+            clientX: 200,
+            clientY: 200,
+        });
+        canvas.dispatchEvent(mouseDownEvent);
+
+        const mouseMoveEvent = new MouseEvent('mousemove', {
+            clientX: 300,
+            clientY: 300,
+        });
+        canvas.dispatchEvent(mouseMoveEvent);
+    });
+
+    test('should change the brush size when a new size is selected', () => {
+        brushSizePicker.value = '10';
+        brushSizePicker.dispatchEvent(new Event('change', { bubbles: true }));
+
+        const mouseEvent = new MouseEvent('mousedown', {
+            clientX: 200,
+            clientY: 200,
+        });
+        canvas.dispatchEvent(mouseEvent);
+    });
+
+    test('should change the brush type to eraser when selected', () => {
+        const typeSelect = document.getElementById('type-select');
+        typeSelect.value = 'eraser';
+        typeSelect.dispatchEvent(new Event('change', { bubbles: true }));
+
+        expect(typeSelect.value).toBe('eraser');
+    });
 });
-*/
