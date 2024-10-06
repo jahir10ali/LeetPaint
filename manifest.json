@@ -3,7 +3,6 @@
   "name": "LeetPaint - Paint Tool for LeetCode",
   "version": "1.0",
   "description": "LeetPaint is paint tool for LeetCode where users can draw and annotate problem diagrams, empowering problem solving.",
-  "permissions": ["scripting"],
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
