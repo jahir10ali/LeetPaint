@@ -1,0 +1,13 @@
+{
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0"
+  },
+  "scripts": {
+    "test": "jest --silent"
+  },
+  "dependencies": {
+    "jest-puppeteer": "^10.1.1",
+    "puppeteer": "^23.5.0"
+  }
+}
