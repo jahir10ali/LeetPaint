@@ -1,6 +1,8 @@
 # LeetPaint - Paint Tool for LeetCode
 ![LeetPaint Logo](https://github.com/jahir10ali/LeetPaint/blob/main/icons/icon128.png?raw=True)
 
+[View on Chrome Web Store](https://chromewebstore.google.com/detail/leetpaint-paint-tool-for/gkbinhgglfpfeoknffdcfbbgeelfmpdn)
+
 ## Table of Contents
 - [What is LeetPaint](#what-is-leetpaint)
 - [Key Features](#key-features)
